@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="api">
+    <CLASSES />
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Downloads/jgoodies-common-1_6_0.zip!/jgoodies-common-1.6.0/docs/api" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

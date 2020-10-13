@@ -1,0 +1,3 @@
+user=hr
+password=hr
+dburl=jdbc:oracle:thin:hr//@localhost:1521:XE
