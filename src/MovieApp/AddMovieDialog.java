@@ -1,7 +1,12 @@
+package MovieApp;
+
+import MovieApp.Model.Movie;
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import MovieApp.DAO.MovieAppDAO;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -20,7 +25,7 @@ public class AddMovieDialog extends JDialog {
     private final JPanel contentPanel = new JPanel();
     private JTextField titleTextField;
     private JTextField releaseTextField;
-    private MovieApp movieApp;
+    private MovieAppDAO movieAppDAO;
     private MovieAppGUI movieAppGUI;
     private JComboBox directorCombo;
     private JComboBox genresComboBox;
@@ -45,9 +50,9 @@ public class AddMovieDialog extends JDialog {
     /**
      * Create the dialog.
      */
-    public AddMovieDialog (MovieApp movieApp, MovieAppGUI movieAppGUI) throws SQLException {
+    public AddMovieDialog (MovieAppDAO movieAppDAO, MovieAppGUI movieApp) throws SQLException {
         this();
-        this.movieApp = movieApp;
+        this.movieAppDAO = movieAppDAO;
         this.movieAppGUI = movieAppGUI;
         fillCombo();
 
@@ -126,6 +131,7 @@ public class AddMovieDialog extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
+
                 JButton saveButton = new JButton("Save");
                 saveButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
@@ -165,13 +171,13 @@ public class AddMovieDialog extends JDialog {
         String director = directorCombo.getSelectedItem().toString();
         String genre = genresComboBox.getSelectedItem().toString();
 
-        int genreId = movieApp.getGenreId(genre);
-        int directorId = movieApp.getDirectorId(director);
+        int genreId = movieAppDAO.getGenreId(genre);
+        int directorId = movieAppDAO.getDirectorId(director);
 
 
         Movie tempMovie = new Movie(title, directorId, genreId, releaseYear );
         try {
-            movieApp.addMovie(tempMovie);
+            movieAppDAO.addMovie(tempMovie);
             JOptionPane.showMessageDialog(this,"Added");
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,7 +186,7 @@ public class AddMovieDialog extends JDialog {
 
 
     private void fillCombo () throws SQLException {
-        myStmt = movieApp.getMyConn().createStatement();
+        myStmt = movieAppDAO.getMyConn().createStatement();
         rst = myStmt.executeQuery("SELECT * FROM GENRES");
         while (rst.next()) {
             String result = rst.getString("NAME");

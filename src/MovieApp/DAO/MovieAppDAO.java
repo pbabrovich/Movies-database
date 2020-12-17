@@ -1,3 +1,5 @@
+package MovieApp.DAO;
+
 import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
@@ -5,12 +7,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-public class MovieApp {
+import MovieApp.Model.Movie;
+
+public final class MovieAppDAO implements IMovieAppDAO {
 
     private Connection myConn;
+    private static MovieAppDAO instance;
 
 
-    public MovieApp() throws Exception {
+    public MovieAppDAO() throws Exception {
         Properties props = new Properties();
         props.load(new FileInputStream("properties"));
 
@@ -18,11 +23,19 @@ public class MovieApp {
         String password = props.getProperty("password");
         String dburl = props.getProperty("dburl");
 
-        Locale.setDefault(Locale.ENGLISH);
+        //Locale.setDefault(Locale.ENGLISH);
         // connect to database
+        Class.forName("com.mysql.cj.jdbc.Driver");
         myConn = DriverManager.getConnection(dburl, user, password);
 
         System.out.println("DB connection successful to: " + dburl);
+    }
+
+    public static MovieAppDAO getInstance() throws Exception {
+        if (instance == null) {
+            instance = new MovieAppDAO();
+        }
+        return instance;
     }
 
     public Connection getMyConn() {
@@ -121,7 +134,7 @@ public class MovieApp {
         }
     }
 
-    public void rateMovie (int movieId, int rating) throws SQLException {
+    public void rateMovie(int movieId, int rating) throws SQLException {
         PreparedStatement myStmt = null;
 
         try {
@@ -145,14 +158,14 @@ public class MovieApp {
             int ratingId = rst.getInt("ID");
             myStmt = myConn.prepareStatement("UPDATE MOVIES SET RATING_ID = ? WHERE ID LIKE ?");
             myStmt.setInt(1, ratingId);
-            myStmt.setInt(2,movieId);
+            myStmt.setInt(2, movieId);
             myStmt.executeUpdate();
         } finally {
             close(myStmt);
         }
     }
 
-    public int getRating (int ratingId) throws Exception {
+    public int getRating(int ratingId) throws Exception {
         PreparedStatement prepState = null;
         ResultSet myRs = null;
 
@@ -194,6 +207,7 @@ public class MovieApp {
             close(prepState, myRs);
         }
     }
+
     public List<Movie> getWatched() throws Exception {
         PreparedStatement prepState = null;
         ResultSet myRs = null;
@@ -258,14 +272,15 @@ public class MovieApp {
         Movie tempMovie;
         if (ratingId != 0) {
             int rating = getRating(ratingId);
-            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year,rating, ratingId);
+            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, rating, ratingId);
         } else {
             tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, ratingId);
 
         }
         return tempMovie;
     }
-    public void deleteMovie (int movieId, int ratingId) throws SQLException {
+
+    public void deleteMovie(int movieId, int ratingId) throws SQLException {
         PreparedStatement myPst = null;
 
         try {
@@ -279,13 +294,10 @@ public class MovieApp {
             myPst.setInt(1, movieId);
             myPst.executeUpdate();
 
-        }
-        finally {
+        } finally {
             close(myPst);
         }
     }
-
-
 
 
     private static void close(Connection myConn, Statement myStmt, ResultSet myRs)
@@ -315,7 +327,7 @@ public class MovieApp {
 
     public static void main(String[] args) throws Exception {
 
-        MovieApp dao = new MovieApp();
+        MovieAppDAO dao = new MovieAppDAO();
         System.out.println(dao.searchMovies("Hello"));
 
         System.out.println(dao.getAllMovies());

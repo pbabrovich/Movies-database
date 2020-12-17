@@ -1,3 +1,6 @@
+package MovieApp;
+import MovieApp.DAO.MovieAppDAO;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,15 +15,15 @@ public class RateDialog extends JDialog {
     private final JPanel contentPanel = new JPanel();
     private JComboBox<Integer> rateBox;
     private int movieId;
-    private MovieApp movieApp;
+    private MovieAppDAO movieAppDAO;
     private MovieAppGUI movieAppGUI;
 
     /**
      * Create the dialog.
      */
-    public RateDialog(int movieId, MovieApp movieApp, MovieAppGUI movieAppGUI) {
+    public RateDialog(int movieId, MovieAppDAO movieAppDAO, MovieAppGUI movieAppGUI) {
         this.movieId = movieId;
-        this.movieApp = movieApp;
+        this.movieAppDAO = movieAppDAO;
         this.movieAppGUI = movieAppGUI;
         setTitle("Rate movie");
         setBounds(800, 300, 200, 150);
@@ -53,7 +56,7 @@ public class RateDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    movieApp.rateMovie(movieId, Integer.parseInt(rateBox.getSelectedItem().toString()));
+                    movieAppDAO.rateMovie(movieId, Integer.parseInt(rateBox.getSelectedItem().toString()));
                     JOptionPane.showMessageDialog(RateDialog.this, "Rated");
                     movieAppGUI.refreshTable();
                     dispose();

@@ -1,4 +1,4 @@
-
+package MovieApp.Model;
 public class Movie {
 
     private int movieId;

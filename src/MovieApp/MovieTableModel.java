@@ -1,3 +1,6 @@
+package MovieApp;
+import MovieApp.Model.Movie;
+
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;

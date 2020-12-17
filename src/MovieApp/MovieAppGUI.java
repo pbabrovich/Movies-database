@@ -1,54 +1,25 @@
+package MovieApp;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import MovieApp.DAO.MovieAppDAO;
+import MovieApp.Model.Movie;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MovieAppGUI extends JFrame {
+    private final JTextField titleTextField;
+    private final JTable table;
+    private MovieAppDAO movieAppDAO = null;
 
-    private JPanel contentPane;
-    private final JPanel panel = new JPanel();
-    private JTextField titleTextField;
-    private JTable table;
-    private MovieApp movieApp;
-    private JPanel panel_1;
-    private JButton addNewMovie;
-    private JButton deleteNewMovie;
-    private JButton watchedMovies;
-    private JButton rate;
-    private JButton showActors;
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    MovieAppGUI frame = new MovieAppGUI();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
-     * Create the frame.
-     */
-    public MovieAppGUI() {
+    public MovieAppGUI(MovieAppDAO movieAppDAO) {
 
         try {
-
-            movieApp = new MovieApp();
+            this.movieAppDAO = movieAppDAO;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e, " Error: ", JOptionPane.ERROR_MESSAGE);
         }
@@ -56,10 +27,11 @@ public class MovieAppGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 450, 300);
         setSize(800, 500);
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
+        JPanel panel = new JPanel();
         FlowLayout flowLayout = (FlowLayout) panel.getLayout();
         flowLayout.setAlignment(FlowLayout.LEFT);
         contentPane.add(panel, BorderLayout.NORTH);
@@ -78,12 +50,12 @@ public class MovieAppGUI extends JFrame {
 
                 try {
                     String title = titleTextField.getText();
-                    List<Movie> movies = null;
+                    java.util.List<Movie> movies = null;
 
                     if (title != null && title.trim().length() > 0) {
-                        movies = movieApp.searchMovies(title);
+                        movies = movieAppDAO.searchMovies(title);
                     } else {
-                        movies = movieApp.getAllMovies();
+                        movies = movieAppDAO.getAllMovies();
                     }
 
 
@@ -101,21 +73,21 @@ public class MovieAppGUI extends JFrame {
         contentPane.add(new JScrollPane(table));
 
 
-        panel_1 = new JPanel();
+        JPanel panel_1 = new JPanel();
         contentPane.add(panel_1, BorderLayout.SOUTH);
 
-        addNewMovie = new JButton("Add movie");
-        deleteNewMovie = new JButton("Delete movie");
-        watchedMovies = new JButton("Watched movies");
-        showActors = new JButton("Show actors");
-        rate = new JButton("Rate selected and add to watched");
+        JButton addNewMovie = new JButton("Add movie");
+        JButton deleteNewMovie = new JButton("Delete movie");
+        JButton watchedMovies = new JButton("Watched movies");
+        JButton showActors = new JButton("Show actors");
+        JButton rate = new JButton("Rate selected and add to watched");
 
         addNewMovie.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 
                 AddMovieDialog addDialog = null;
                 try {
-                    addDialog = new AddMovieDialog(movieApp, MovieAppGUI.this);
+                    addDialog = new AddMovieDialog(movieAppDAO, MovieAppGUI.this);
                     addDialog.setVisible(true);
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -144,7 +116,7 @@ public class MovieAppGUI extends JFrame {
 
                     Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
 
-                    movieApp.deleteMovie(tempMovie.getMovieId(), tempMovie.getRatingId());
+                    movieAppDAO.deleteMovie(tempMovie.getMovieId(), tempMovie.getRatingId());
 
                     refreshTable();
 
@@ -163,9 +135,9 @@ public class MovieAppGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                List<Movie> movies = null;
+                java.util.List<Movie> movies = null;
                 try {
-                    movies = movieApp.getWatched();
+                    movies = movieAppDAO.getWatched();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -191,7 +163,7 @@ public class MovieAppGUI extends JFrame {
                     if (tempMovie.getRatingId() != 0) {
                         JOptionPane.showMessageDialog(MovieAppGUI.this, "Already rated");
                     } else {
-                        RateDialog rate = new RateDialog(tempMovie.getMovieId(), movieApp, MovieAppGUI.this);
+                        RateDialog rate = new RateDialog(tempMovie.getMovieId(), movieAppDAO, MovieAppGUI.this);
                         rate.setVisible(true);
                     }
 
@@ -214,7 +186,7 @@ public class MovieAppGUI extends JFrame {
 
     public void refreshTable() {
         try {
-            List<Movie> list = movieApp.getAllMovies();
+            List<Movie> list = movieAppDAO.getAllMovies();
 
             MovieTableModel tableModel = new MovieTableModel(list);
             table.setModel(tableModel);
@@ -222,5 +194,4 @@ public class MovieAppGUI extends JFrame {
 
         }
     }
-
 }
