@@ -1,6 +1,7 @@
 package MovieApp;
 
 import MovieApp.DAO.MovieAppDAO;
+import MovieApp.Logic.MovieManager;
 import MovieApp.Model.Movie;
 
 import javax.swing.*;
@@ -14,15 +15,11 @@ import java.util.List;
 public class MovieAppGUI extends JFrame {
     private final JTextField titleTextField;
     private final JTable table;
-    private MovieAppDAO movieAppDAO = null;
 
-    public MovieAppGUI(MovieAppDAO movieAppDAO) {
+    MovieManager movieManager;
 
-        try {
-            this.movieAppDAO = movieAppDAO;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e, " Error: ", JOptionPane.ERROR_MESSAGE);
-        }
+    public MovieAppGUI(MovieManager movieManager) {
+        this.movieManager = movieManager;
         setTitle("Movie App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 450, 300);
@@ -44,18 +41,19 @@ public class MovieAppGUI extends JFrame {
         panel.add(titleTextField);
         titleTextField.setColumns(10);
 
-        JButton btnNewButton = new JButton("Search title or genre");
-        btnNewButton.addActionListener(new ActionListener() {
+        JButton searchButton = new JButton("Search title or genre");
+        searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 
                 try {
                     String title = titleTextField.getText();
-                    java.util.List<Movie> movies = null;
+
+                    List<Movie> movies = null;
 
                     if (title != null && title.trim().length() > 0) {
-                        movies = movieAppDAO.searchMovies(title);
+                        movies = movieManager.searchMovies(title);
                     } else {
-                        movies = movieAppDAO.getAllMovies();
+                        movies = movieManager.getAllMovies();
                     }
 
 
@@ -67,7 +65,7 @@ public class MovieAppGUI extends JFrame {
                 }
             }
         });
-        panel.add(btnNewButton);
+        panel.add(searchButton);
 
         table = new JTable();
         contentPane.add(new JScrollPane(table));
@@ -87,11 +85,11 @@ public class MovieAppGUI extends JFrame {
 
                 AddMovieDialog addDialog = null;
                 try {
-                    addDialog = new AddMovieDialog(movieAppDAO, MovieAppGUI.this);
-                    addDialog.setVisible(true);
-                } catch (SQLException e) {
+                    addDialog = new AddMovieDialog(MovieAppGUI.this);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
+                addDialog.setVisible(true);
 
 
             }
@@ -116,7 +114,7 @@ public class MovieAppGUI extends JFrame {
 
                     Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
 
-                    movieAppDAO.deleteMovie(tempMovie.getMovieId(), tempMovie.getRatingId());
+                    movieManager.deleteMovie(tempMovie);
 
                     refreshTable();
 
@@ -135,9 +133,9 @@ public class MovieAppGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                java.util.List<Movie> movies = null;
+                List<Movie> movies = null;
                 try {
-                    movies = movieAppDAO.getWatched();
+                    movies = movieManager.getWatched();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -149,25 +147,20 @@ public class MovieAppGUI extends JFrame {
         rate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 try {
                     int row = table.getSelectedRow();
                     if (row < 0) {
                         JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
                         return;
                     }
-
-
                     Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
 
                     if (tempMovie.getRatingId() != 0) {
                         JOptionPane.showMessageDialog(MovieAppGUI.this, "Already rated");
                     } else {
-                        RateDialog rate = new RateDialog(tempMovie.getMovieId(), movieAppDAO, MovieAppGUI.this);
+                        RateDialog rate = new RateDialog(tempMovie.getMovieId(), MovieAppGUI.this);
                         rate.setVisible(true);
                     }
-
-
 
                 } catch (Exception exc) {
                     JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -186,7 +179,7 @@ public class MovieAppGUI extends JFrame {
 
     public void refreshTable() {
         try {
-            List<Movie> list = movieAppDAO.getAllMovies();
+            List<Movie> list = movieManager.getAllMovies();
 
             MovieTableModel tableModel = new MovieTableModel(list);
             table.setModel(tableModel);

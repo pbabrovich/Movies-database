@@ -1,6 +1,8 @@
 package MovieApp;
 
 import MovieApp.DAO.MovieAppDAO;
+import MovieApp.Logic.MovieManager;
+
 import java.awt.EventQueue;
 
 
@@ -14,8 +16,8 @@ public class MovieApp {
      */
     public static void main(String[] args) {
                 try {
-                    movieAppDAO = MovieAppDAO.getInstance();
-                    MovieAppGUI frame = new MovieAppGUI(movieAppDAO);
+                    MovieManager movieManager = new MovieManager();
+                    MovieAppGUI frame = new MovieAppGUI(movieManager);
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();

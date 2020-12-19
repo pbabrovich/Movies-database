@@ -34,6 +34,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
     public static MovieAppDAO getInstance() throws Exception {
         if (instance == null) {
             instance = new MovieAppDAO();
+            System.out.println("Created");
         }
         return instance;
     }
@@ -59,8 +60,6 @@ public final class MovieAppDAO implements IMovieAppDAO {
                 Movie tempMovie = convertRowToMovie(myRs);
                 list.add(tempMovie);
             }
-
-
             return list;
         } finally {
             close(myStmt, myRs);
