@@ -1,4 +1,4 @@
-package MovieApp;
+package MovieApp.GUI;
 
 import MovieApp.Model.Movie;
 import java.awt.*;
@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import MovieApp.DAO.MovieAppDAO;
+import MovieApp.MovieApp;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -20,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class AddMovieDialog extends JDialog {
+public class NewMovieDialog extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField titleTextField;
@@ -35,7 +36,7 @@ public class AddMovieDialog extends JDialog {
     /**
      * Create the dialog.
      */
-    public AddMovieDialog (MovieAppGUI movieAppGUI) throws Exception {
+    public NewMovieDialog(MovieAppGUI movieAppGUI) throws Exception {
         this();
         fillCombo();
         this.movieAppGUI = movieAppGUI;
@@ -47,7 +48,7 @@ public class AddMovieDialog extends JDialog {
 
     }
 
-    public AddMovieDialog() throws SQLException {
+    public NewMovieDialog() throws SQLException {
 
         setTitle("Add movie to base ");
         setBounds(600, 300, 450, 300);

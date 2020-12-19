@@ -1,15 +1,14 @@
-package MovieApp;
+package MovieApp.GUI;
 
-import MovieApp.DAO.MovieAppDAO;
 import MovieApp.Logic.MovieManager;
 import MovieApp.Model.Movie;
+import MovieApp.Model.MovieTableModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.List;
 
 public class MovieAppGUI extends JFrame {
@@ -83,9 +82,9 @@ public class MovieAppGUI extends JFrame {
         addNewMovie.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 
-                AddMovieDialog addDialog = null;
+                NewMovieDialog addDialog = null;
                 try {
-                    addDialog = new AddMovieDialog(MovieAppGUI.this);
+                    addDialog = new NewMovieDialog(MovieAppGUI.this);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

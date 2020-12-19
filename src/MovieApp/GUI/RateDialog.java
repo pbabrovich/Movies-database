@@ -1,4 +1,4 @@
-package MovieApp;
+package MovieApp.GUI;
 import MovieApp.DAO.MovieAppDAO;
 import MovieApp.Model.Rating;
 

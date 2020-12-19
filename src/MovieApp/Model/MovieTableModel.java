@@ -1,12 +1,13 @@
-package MovieApp;
+package MovieApp.Model;
 import MovieApp.Model.Movie;
+import MovieApp.MovieApp;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 
-class MovieTableModel extends AbstractTableModel {
+public class MovieTableModel extends AbstractTableModel {
 
     public static final int OBJECT_COL = -1;
     private static final int TITLE_COL = 0;
