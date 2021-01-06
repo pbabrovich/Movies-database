@@ -27,4 +27,5 @@ interface IMovieAppDAO {
     public void deleteMovie(int movieId, int ratingId) throws SQLException;
 
 
+    void addToWatched(int movieId) throws SQLException;
 }

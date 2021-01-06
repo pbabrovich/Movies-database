@@ -1,23 +1,26 @@
 package MovieApp.GUI;
 
+import MovieApp.Logic.IMovieManager;
 import MovieApp.Logic.MovieManager;
 import MovieApp.Model.Movie;
 import MovieApp.Model.MovieTableModel;
+import MovieApp.MovieApp;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 public class MovieAppGUI extends JFrame {
     private final JTextField titleTextField;
     private final JTable table;
 
-    MovieManager movieManager;
+    IMovieManager movieManager;
 
-    public MovieAppGUI(MovieManager movieManager) {
+    public MovieAppGUI(IMovieManager movieManager) {
         this.movieManager = movieManager;
         setTitle("Movie App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,25 +46,7 @@ public class MovieAppGUI extends JFrame {
         JButton searchButton = new JButton("Search title or genre");
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-
-                try {
-                    String title = titleTextField.getText();
-
-                    List<Movie> movies = null;
-
-                    if (title != null && title.trim().length() > 0) {
-                        movies = movieManager.searchMovies(title);
-                    } else {
-                        movies = movieManager.getAllMovies();
-                    }
-
-
-                    MovieTableModel tableModel = new MovieTableModel(movies);
-                    table.setModel(tableModel);
-
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(MovieAppGUI.this, "Error" + e, "Error ", JOptionPane.ERROR_MESSAGE);
-                }
+                searchMovie();
             }
         });
         panel.add(searchButton);
@@ -76,114 +61,189 @@ public class MovieAppGUI extends JFrame {
         JButton addNewMovie = new JButton("Add movie");
         JButton deleteNewMovie = new JButton("Delete movie");
         JButton watchedMovies = new JButton("Watched movies");
-        JButton showActors = new JButton("Show actors");
-        JButton rate = new JButton("Rate selected and add to watched");
+        JButton rate = new JButton("Rate selected");
+        JButton addToWatched = new JButton("Add to watched");
+        JButton summary = new JButton("Summary");
 
         addNewMovie.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-
-                NewMovieDialog addDialog = null;
-                try {
-                    addDialog = new NewMovieDialog(MovieAppGUI.this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                addDialog.setVisible(true);
-
-
+                addNewMovie();
             }
         });
-
 
         deleteNewMovie.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                try {
-                    int row = table.getSelectedRow();
-                    if (row < 0) {
-                        JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
-                        return;
-                    }
-
-                    int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this, "Delete this movie?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (callDialog != JOptionPane.YES_OPTION) {
-                        return;
-                    }
-
-                    Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
-
-                    movieManager.deleteMovie(tempMovie);
-
-                    refreshTable();
-
-                    JOptionPane.showMessageDialog(MovieAppGUI.this, "Deleted", "Movie deleted", JOptionPane.INFORMATION_MESSAGE);
-
-
-                } catch (Exception exc) {
-                    JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-
+                deleteMovie();
             }
         });
+
 
         watchedMovies.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                List<Movie> movies = null;
-                try {
-                    movies = movieManager.getWatched();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                MovieTableModel tableModel = new MovieTableModel(movies);
-                table.setModel(tableModel);
+                getWatched();
             }
         });
 
         rate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int row = table.getSelectedRow();
-                    if (row < 0) {
-                        JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
-                        return;
-                    }
-                    Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
-
-                    if (tempMovie.getRatingId() != 0) {
-                        JOptionPane.showMessageDialog(MovieAppGUI.this, "Already rated");
-                    } else {
-                        RateDialog rate = new RateDialog(tempMovie.getMovieId(), MovieAppGUI.this);
-                        rate.setVisible(true);
-                    }
-
-                } catch (Exception exc) {
-                    JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
-                }
-
+                rateMovie();
             }
         });
 
+        addToWatched.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addToWatched();
+            }
+        });
 
+        summary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                summary();
+            }
+        });
         panel_1.add(addNewMovie);
         panel_1.add(deleteNewMovie);
         panel_1.add(watchedMovies);
-        panel_1.add(showActors);
         panel_1.add(rate);
+        panel_1.add(addToWatched);
+        panel_1.add(summary);
+        listAll();
     }
 
-    public void refreshTable() {
+    public void addNewMovie() {
+        NewMovieDialog addDialog = null;
+        try {
+            addDialog = new NewMovieDialog(MovieAppGUI.this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addDialog.setVisible(true);
+    }
+
+    public void deleteMovie() {
+        try {
+            int row = table.getSelectedRow();
+            if (row < 0) {
+                JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
+                return;
+            }
+
+            int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
+                    "Delete this movie?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (callDialog != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
+
+            movieManager.deleteMovie(tempMovie);
+
+            listAll();
+
+            JOptionPane.showMessageDialog(MovieAppGUI.this, "Deleted", "Movie deleted", JOptionPane.INFORMATION_MESSAGE);
+
+
+        } catch (Exception exc) {
+            JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public void listAll() {
         try {
             List<Movie> list = movieManager.getAllMovies();
-
             MovieTableModel tableModel = new MovieTableModel(list);
             table.setModel(tableModel);
         } catch (Exception e) {
 
         }
     }
+
+    public void getWatched() {
+        List<Movie> movies = null;
+        try {
+            movies = movieManager.getWatched();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        MovieTableModel tableModel = new MovieTableModel(movies);
+        table.setModel(tableModel);
+    }
+
+    public void rateMovie() {
+        try {
+            int row = table.getSelectedRow();
+            if (row < 0) {
+                JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
+                return;
+            }
+            Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
+
+            if (tempMovie.getRatingId() != 0) {
+                JOptionPane.showMessageDialog(MovieAppGUI.this, "Already rated");
+                int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
+                        "Already rated. Add new rating to this movie?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (callDialog == JOptionPane.NO_OPTION) {
+                    return;
+                }
+            }
+            RateDialog rate = new RateDialog(MovieAppGUI.this, tempMovie);
+            rate.setVisible(true);
+
+
+        } catch (Exception exc) {
+            JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    }
+
+    public void searchMovie() {
+        MovieTableModel tableModel = null;
+        try {
+            String title = titleTextField.getText();
+            List<Movie> movies = movieManager.searchMovies(title);
+            if (movies != null) {
+                tableModel = new MovieTableModel(movieManager.searchMovies(title));
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        if (tableModel != null) {
+            table.setModel(tableModel);
+        } else {
+            JOptionPane.showMessageDialog(this, "Provide title");
+            listAll();
+        }
+
+    }
+
+    public void addToWatched() {
+        try {
+            int row = table.getSelectedRow();
+            if (row < 0) {
+                JOptionPane.showMessageDialog(MovieAppGUI.this, "You must select a movie");
+                return;
+            }
+            Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
+            movieManager.addToWatched(tempMovie);
+            System.out.println(tempMovie.getIsWatched());
+            listAll();
+
+        } catch (Exception exc) {
+            JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public void summary() {
+        int averageRating = movieManager.getSummary().get("Average rating");
+        int moviesWatched = movieManager.getSummary().get("Watched movies");
+        JOptionPane.showMessageDialog(this, "Average rating : " + averageRating + "\n" +
+                "Watched movies : " + moviesWatched);
+    }
+
+
 }

@@ -51,7 +51,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
 
         try {
             myStmt = myConn.createStatement();
-            myRs = myStmt.executeQuery("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id " +
+            myRs = myStmt.executeQuery("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id, a.watched " +
                     "FROM MOVIES a INNER JOIN directors b ON a.director_id = b.id " +
                     "INNER JOIN genres c ON a.genre_id = c.id " +
                     "INNER JOIN genres d ON d.id = a.genre_id");
@@ -98,7 +98,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
 
         try {
             title += "%";
-            myStmt = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id " +
+            myStmt = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id, a.watched " +
                     "FROM MOVIES a INNER JOIN directors b ON a.director_id = b.id " +
                     "INNER JOIN genres c ON a.genre_id = c.id " +
                     "INNER JOIN genres d ON d.id = a.genre_id " +
@@ -112,7 +112,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
                 Movie tempMovie = convertRowToMovie(myRs);
                 list.add(tempMovie);
             }
-            myStmt = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id " +
+            myStmt = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id, a.watched " +
                     "FROM MOVIES a " +
                     "INNER JOIN directors b ON a.director_id = b.id " +
                     "INNER JOIN genres c ON a.genre_id = c.id " +
@@ -159,6 +159,25 @@ public final class MovieAppDAO implements IMovieAppDAO {
             myStmt.setInt(1, ratingId);
             myStmt.setInt(2, movieId);
             myStmt.executeUpdate();
+        } finally {
+            close(myStmt);
+        }
+    }
+
+    public void updateRating(int movieId, int rating) throws SQLException {
+        PreparedStatement myStmt = null;
+
+        try {
+            // prepare statement
+
+            myStmt = myConn.prepareStatement("UPDATE MOVIE_RATINGS SET RATING = ? WHERE MOVIE_ID LIKE ?");
+
+            // set params
+            myStmt.setInt(1, rating);
+            myStmt.setInt(2, movieId);
+            // execute SQL
+            myStmt.executeUpdate();
+
         } finally {
             close(myStmt);
         }
@@ -266,14 +285,15 @@ public final class MovieAppDAO implements IMovieAppDAO {
         String last_name = myRs.getString("LAST_NAME");
         String genre = myRs.getString("NAME");
         String release_year = myRs.getString("RELEASE_YEAR");
+        int isWatched = myRs.getInt("WATCHED");
 
         int ratingId = myRs.getInt("RATING_ID");
         Movie tempMovie;
         if (ratingId != 0) {
             int rating = getRating(ratingId);
-            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, rating, ratingId);
+            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, rating, ratingId, isWatched);
         } else {
-            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, ratingId);
+            tempMovie = new Movie(id, title, first_name, last_name, genre, release_year, ratingId, isWatched);
 
         }
         return tempMovie;
@@ -293,6 +313,21 @@ public final class MovieAppDAO implements IMovieAppDAO {
             myPst.setInt(1, movieId);
             myPst.executeUpdate();
 
+        } finally {
+            close(myPst);
+        }
+    }
+
+    @Override
+    public void addToWatched(int movieId) throws SQLException {
+        PreparedStatement myPst = null;
+
+        try{
+            myPst = myConn.prepareStatement("UPDATE MOVIES SET WATCHED = ? WHERE ID LIKE ?");
+            myPst.setInt(1, 1);
+            myPst.setInt(2, movieId);
+            myPst.executeUpdate();
+            System.out.println("DONE");
         } finally {
             close(myPst);
         }
@@ -324,12 +359,5 @@ public final class MovieAppDAO implements IMovieAppDAO {
         close(null, myStmt, null);
     }
 
-    public static void main(String[] args) throws Exception {
-
-        MovieAppDAO dao = new MovieAppDAO();
-        System.out.println(dao.searchMovies("Hello"));
-
-        System.out.println(dao.getAllMovies());
-    }
 }
 

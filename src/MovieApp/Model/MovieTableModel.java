@@ -1,6 +1,6 @@
 package MovieApp.Model;
-import MovieApp.Model.Movie;
-import MovieApp.MovieApp;
+
+import MovieApp.Logic.MovieManager;
 
 import java.util.List;
 
@@ -15,9 +15,12 @@ public class MovieTableModel extends AbstractTableModel {
     private static final int DIRECTOR_COL = 2;
     private static final int RELEASE_YEAR_COL = 3;
     private static final int YOUR_RATING_COL = 4;
+    private static final int WATCHED_COL = 5;
 
-    private String[] columnNames = {"Title", "Genre", "Director", "Release year", "Your rating"};
+
+    private String[] columnNames = {"Title", "Genre", "Director", "Release year", "Your rating", "Watched"};
     private List<Movie> movies;
+
 
     public MovieTableModel(List<Movie> theMovies) {
         movies = theMovies;
@@ -54,6 +57,8 @@ public class MovieTableModel extends AbstractTableModel {
                 return tempMovie.getReleaseYear();
             case YOUR_RATING_COL:
                 return tempMovie.getRating();
+            case WATCHED_COL:
+                return MovieManager.getStatus(tempMovie);
             case OBJECT_COL:
                 return tempMovie;
             default:

@@ -11,8 +11,10 @@ public class Movie {
     private String releaseYear;
     private int rating;
     private int ratingId;
+    private int isWatched;
 
-    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating) {
+
+    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int isWatched) {
         super();
         this.movieId = movieId;
         this.title = title;
@@ -21,8 +23,9 @@ public class Movie {
         this.genre = genre;
         this.releaseYear = releaseYear;
         this.rating = rating;
+        this.isWatched = isWatched;
     }
-    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int ratingId) {
+    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int ratingId, int isWatched) {
         super();
         this.movieId = movieId;
         this.title = title;
@@ -32,6 +35,7 @@ public class Movie {
         this.releaseYear = releaseYear;
         this.rating = rating;
         this.ratingId = ratingId;
+        this.isWatched = isWatched;
     }
 
     public Movie(int ratingId) {
@@ -129,6 +133,14 @@ public class Movie {
                         movieId, title, directorId, genreId, releaseYear, rating);
     }
 
+    public int getIsWatched() {
+        return isWatched;
+    }
 
-
+    public String getStatus() {
+        if (isWatched == 1) {
+            return "Watched";
+        }
+        else return "Unwatched";
+    }
 }

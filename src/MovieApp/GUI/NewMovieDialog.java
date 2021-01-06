@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import MovieApp.DAO.MovieAppDAO;
-import MovieApp.MovieApp;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -127,7 +126,7 @@ public class NewMovieDialog extends JDialog {
                     public void actionPerformed(ActionEvent arg0) {
                         try {
                             saveMovie();
-                            movieAppGUI.refreshTable();
+                            movieAppGUI.listAll();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -146,7 +145,7 @@ public class NewMovieDialog extends JDialog {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         dispose();
-                        movieAppGUI.refreshTable();
+                        movieAppGUI.listAll();
                     }
                 });
             }
@@ -163,12 +162,10 @@ public class NewMovieDialog extends JDialog {
 
         int genreId = movieAppGUI.movieManager.getGenreId(genre);
         int directorId = movieAppGUI.movieManager.getDirectorId(director);
-
-
-        Movie tempMovie = new Movie(title, directorId, genreId, releaseYear );
+        String message;
         try {
-            movieAppGUI.movieManager.saveMovie(tempMovie);
-            JOptionPane.showMessageDialog(this,"Added");
+            message = movieAppGUI.movieManager.saveMovie(title, releaseYear, director, genre, genreId, directorId);
+            JOptionPane.showMessageDialog(this,message);
         } catch (Exception e) {
             e.printStackTrace();
         }

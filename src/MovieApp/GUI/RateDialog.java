@@ -1,5 +1,8 @@
 package MovieApp.GUI;
+
 import MovieApp.DAO.MovieAppDAO;
+import MovieApp.Logic.MovieManager;
+import MovieApp.Model.Movie;
 import MovieApp.Model.Rating;
 
 import java.awt.BorderLayout;
@@ -15,16 +18,21 @@ public class RateDialog extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JComboBox<Integer> rateBox;
-    private int movieId;
-    private MovieAppDAO movieAppDAO;
+    private int rating;
     private MovieAppGUI movieAppGUI;
+    private Movie movie;
+
+
+
 
     /**
      * Create the dialog.
      */
-    public RateDialog(int movieId, MovieAppGUI movieAppGUI) {
-        this.movieId = movieId;
+    public RateDialog(MovieAppGUI movieAppGUI,Movie movie) {
         this.movieAppGUI = movieAppGUI;
+        this.movie = movie;
+
+
         setTitle("Rate movie");
         setBounds(800, 300, 200, 150);
         getContentPane().setLayout(new BorderLayout());
@@ -34,7 +42,6 @@ public class RateDialog extends JDialog {
 
         JLabel lblNewLabel = new JLabel("Chose your rating for this movie");
         contentPanel.add(lblNewLabel);
-
 
         rateBox = new JComboBox<Integer>();
         rateBox.addItem(Rating.FIVE_STAR.getValue());
@@ -55,22 +62,11 @@ public class RateDialog extends JDialog {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    movieAppGUI.movieManager.rateMovie(movieId, Integer.parseInt(rateBox.getSelectedItem().toString()));
-                    JOptionPane.showMessageDialog(RateDialog.this, "Rated");
-                    movieAppGUI.refreshTable();
-                    dispose();
-
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
-
+                rateMovie();
             }
         });
         buttonPane.add(okButton);
         getRootPane().setDefaultButton(okButton);
-
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setActionCommand("Cancel");
@@ -81,8 +77,23 @@ public class RateDialog extends JDialog {
             }
         });
         buttonPane.add(cancelButton);
+    }
 
+    public void rateMovie() {
+        rating = Integer.parseInt(rateBox.getSelectedItem().toString());
+        String result = null;
+        try {
+            result = movieAppGUI.movieManager.rateMovie(movie, rating);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        JOptionPane.showMessageDialog( this, result);
+        dispose();
+        movieAppGUI.listAll();
+    }
 
+    public int getRating() {
+        return rating;
     }
 
 }

@@ -1,13 +1,14 @@
 package MovieApp;
 
 import MovieApp.GUI.MovieAppGUI;
+import MovieApp.Logic.IMovieManager;
 import MovieApp.Logic.MovieManager;
 
 
 public class MovieApp {
 
 
-    private static MovieManager movieManager;
+    private static IMovieManager movieManager;
     private static MovieAppGUI frame;
 
     /**
