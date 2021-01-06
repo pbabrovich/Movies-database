@@ -184,7 +184,6 @@ public class MovieAppGUI extends JFrame {
             Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
 
             if (tempMovie.getRatingId() != 0) {
-                JOptionPane.showMessageDialog(MovieAppGUI.this, "Already rated");
                 int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
                         "Already rated. Add new rating to this movie?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (callDialog == JOptionPane.NO_OPTION) {
@@ -230,8 +229,16 @@ public class MovieAppGUI extends JFrame {
             }
             Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
             movieManager.addToWatched(tempMovie);
-            System.out.println(tempMovie.getIsWatched());
+            int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
+                    "Do you want to rate the movie?", "Rate movie", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (callDialog == JOptionPane.NO_OPTION) {
+                listAll();
+                return;
+            }
+            rateMovie();
             listAll();
+
+
 
         } catch (Exception exc) {
             JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
