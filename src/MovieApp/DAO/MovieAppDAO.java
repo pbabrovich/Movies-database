@@ -90,6 +90,70 @@ public final class MovieAppDAO implements IMovieAppDAO {
 
     }
 
+    public void addToWatchLater(int id) throws Exception {
+        PreparedStatement myStmt = null;
+
+        try {
+            myStmt = myConn.prepareStatement("INSERT INTO WATCH_LATER"
+                    + " (MOVIE_ID)"
+                    + " values (?)");
+
+            // set params
+            myStmt.setString(1, Integer.toString(id));
+            // execute SQL
+            myStmt.executeUpdate();
+
+        } finally {
+            close(myStmt);
+        }
+
+    }
+
+    public List<Movie> getToWatchList() throws SQLException {
+        List<Movie> list = new ArrayList<>();
+
+        Statement myStmt = null;
+        ResultSet myRs = null;
+
+        try {
+            myStmt = myConn.createStatement();
+            myRs = myStmt.executeQuery("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id, a.watched " +
+                    "FROM MOVIES a INNER JOIN directors b ON a.director_id = b.id " +
+                    "INNER JOIN genres c ON a.genre_id = c.id " +
+                    "INNER JOIN watch_later d ON a.id = d.movie_id " +
+                    "INNER JOIN genres e ON e.id = a.genre_id");
+
+            while (myRs.next()) {
+                Movie tempMovie = convertRowToMovie(myRs);
+                list.add(tempMovie);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(myStmt, myRs);
+        }
+        return list;
+    }
+
+    public boolean checkWatchLater(int id) throws Exception {
+        PreparedStatement myStmt = null;
+        ResultSet myRs = null;
+        try {
+            myStmt = myConn.prepareStatement("SELECT ID FROM WATCH_LATER WHERE MOVIE_ID LIKE ?");
+
+            // set params
+            myStmt.setString(1, Integer.toString(id));
+            // execute SQL
+            myRs = myStmt.executeQuery();
+            return myRs.next();
+
+        } finally {
+            close(myStmt);
+        }
+
+    }
+
     public List<Movie> searchMovies(String title) throws Exception {
         List<Movie> list = new ArrayList<>();
 
@@ -322,7 +386,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
     public void addToWatched(int movieId) throws SQLException {
         PreparedStatement myPst = null;
 
-        try{
+        try {
             myPst = myConn.prepareStatement("UPDATE MOVIES SET WATCHED = ? WHERE ID LIKE ?");
             myPst.setInt(1, 1);
             myPst.setInt(2, movieId);

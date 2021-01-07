@@ -129,8 +129,8 @@ public class Movie {
     @Override
     public String toString() {
         return String
-                .format("Movie [id=%s, Title=%s, Director id=%s, Genre id=%s, release year=%s, rating=%s]",
-                        movieId, title, directorId, genreId, releaseYear, rating);
+                .format("Movie [id=%s, Title=%s, Director id=%s, Genre id=%s, release year=%s, rating=%s, ratingID=%s]",
+                        movieId, title, directorId, genreId, releaseYear, rating, ratingId);
     }
 
     public int getIsWatched() {

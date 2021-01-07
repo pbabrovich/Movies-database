@@ -81,15 +81,7 @@ public class RateDialog extends JDialog {
 
     public void rateMovie() {
         rating = Integer.parseInt(rateBox.getSelectedItem().toString());
-        String result = null;
-        try {
-            result = movieAppGUI.movieManager.rateMovie(movie, rating);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        JOptionPane.showMessageDialog( this, result);
-        dispose();
-        movieAppGUI.listAll();
+        this.dispose();
     }
 
     public int getRating() {

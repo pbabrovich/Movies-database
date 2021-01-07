@@ -46,15 +46,49 @@ public class MovieManager implements IMovieManager {
             return null;
     }
 
-    public String addToWatched(Movie movie) throws SQLException {
+    public String addToWatched(Movie movie, int rating) throws SQLException {
         String result = null;
         if (movie.getIsWatched() == 1) {
             result = "This movie is already watched";
         } else {
             movieAppDAO.addToWatched(movie.getMovieId());
             result = "Added to watched";
+            if (rating != 0) {
+                rateMovie(movie, rating);
+                result += " and rated";
+            }
         }
         return result;
+    }
+
+    public String addToWatchLater(Movie movie) {
+        String result = null;
+        int id = movie.getMovieId();
+        try {
+            if (!movieAppDAO.checkWatchLater(id)) {
+                if (movie.getIsWatched() == 1) {
+                    result = "Movie is watched";
+                } else {
+                    movieAppDAO.addToWatchLater(id);
+                    result = "Added to watch later list";
+                }
+            } else
+                result = "Movie is already in watch later list";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<Movie> getWatchLaterList() {
+        List<Movie> movies = null;
+        try {
+            movies = movieAppDAO.getToWatchList();
+            return movies;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -76,10 +110,12 @@ public class MovieManager implements IMovieManager {
     public String rateMovie(Movie movie, int rating) throws SQLException {
         int movieId = movie.getMovieId();
         if (movie.getRatingId() == 0 && rating != 0) {
+            movie.setRating(rating);
             movieAppDAO.rateMovie(movieId, rating);
             return "Rated";
         }
         if (movie.getRatingId() != 0 && rating != 0) {
+            movie.setRating(rating);
             movieAppDAO.updateRating(movieId, rating);
             return "Rating updated";
         } else
