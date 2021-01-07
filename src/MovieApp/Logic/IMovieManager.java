@@ -25,7 +25,7 @@ public interface IMovieManager {
 
     public int getDirectorId(String genre) throws Exception;
 
-    public String addToWatched(Movie tempMovie, int rating) throws SQLException;
+    public String addToWatched(Movie tempMovie, int rateConfirmed) throws SQLException;
 
     public Map<String, Integer> getSummary();
 

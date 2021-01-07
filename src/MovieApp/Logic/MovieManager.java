@@ -46,15 +46,14 @@ public class MovieManager implements IMovieManager {
             return null;
     }
 
-    public String addToWatched(Movie movie, int rating) throws SQLException {
+    public String addToWatched(Movie movie, int rateConfirmed) throws SQLException {
         String result = null;
         if (movie.getIsWatched() == 1) {
             result = "This movie is already watched";
         } else {
             movieAppDAO.addToWatched(movie.getMovieId());
             result = "Added to watched";
-            if (rating != 0) {
-                rateMovie(movie, rating);
+            if (rateConfirmed != 0) {
                 result += " and rated";
             }
         }

@@ -210,15 +210,12 @@ public class MovieAppGUI extends JFrame {
             }
             RateDialog rate = new RateDialog(MovieAppGUI.this, tempMovie);
             rate.setVisible(true);
-            movieManager.rateMovie(tempMovie, rate.getRating());
-            System.out.println(rate.getRating());
-
+            listAll();
 
 
         } catch (Exception exc) {
             JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
         }
-
     }
 
     public void searchMovie() {
@@ -241,7 +238,8 @@ public class MovieAppGUI extends JFrame {
     }
 
     public void addToWatched() {
-        int rating = 0;
+        int rateConfirmed = 0;
+
         try {
 
             int row = table.getSelectedRow();
@@ -254,11 +252,13 @@ public class MovieAppGUI extends JFrame {
             int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
                     "Do you want to rate the movie?", "Rate movie", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (callDialog == JOptionPane.NO_OPTION) {
+                movieManager.addToWatched(tempMovie, rateConfirmed);
                 listAll();
                 return;
             }
-            rating =  new RateDialog(this, tempMovie).getRating();
-            System.out.println(tempMovie.toString());
+            rateConfirmed = 1;
+            rateMovie();
+            movieManager.addToWatched(tempMovie, rateConfirmed);
             listAll();
         } catch (Exception exc) {
             JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
