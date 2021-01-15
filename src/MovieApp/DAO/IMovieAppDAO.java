@@ -2,15 +2,14 @@ package MovieApp.DAO;
 
 import MovieApp.Model.Movie;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-interface IMovieAppDAO {
+public interface IMovieAppDAO {
 
     public List<Movie> getAllMovies() throws Exception;
 
-    public void addMovie(Movie theMovie) throws Exception;
+    public boolean addMovie(Movie theMovie) throws Exception;
 
     public List<Movie> searchMovies(String title) throws Exception;
 
@@ -26,11 +25,16 @@ interface IMovieAppDAO {
 
     public void deleteMovie(int movieId, int ratingId) throws SQLException;
 
-    public void addToWatchLater(int id) throws Exception;
+    public boolean addToWatchLater(int id) throws Exception;
 
     public boolean checkWatchLater(int id) throws Exception;
 
     public List<Movie> getToWatchList() throws SQLException;
 
+    public void updateRating(int movieId, int rating) throws SQLException;
+
     void addToWatched(int movieId) throws SQLException;
+
+    public Movie getMovie(int id) throws SQLException;
+
 }

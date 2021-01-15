@@ -4,12 +4,11 @@ import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 
 import MovieApp.Model.Movie;
 
-public final class MovieAppDAO implements IMovieAppDAO {
+public class MovieAppDAO implements IMovieAppDAO {
 
     private Connection myConn;
     private static MovieAppDAO instance;
@@ -66,7 +65,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
         }
     }
 
-    public void addMovie(Movie theMovie) throws Exception {
+    public boolean addMovie(Movie theMovie) throws Exception {
         PreparedStatement myStmt = null;
 
         try {
@@ -83,14 +82,15 @@ public final class MovieAppDAO implements IMovieAppDAO {
 
             // execute SQL
             myStmt.executeUpdate();
+            return true;
 
         } finally {
             close(myStmt);
-        }
 
+        }
     }
 
-    public void addToWatchLater(int id) throws Exception {
+    public boolean addToWatchLater(int id) throws Exception {
         PreparedStatement myStmt = null;
 
         try {
@@ -102,10 +102,12 @@ public final class MovieAppDAO implements IMovieAppDAO {
             myStmt.setString(1, Integer.toString(id));
             // execute SQL
             myStmt.executeUpdate();
+            return true;
 
         } finally {
             close(myStmt);
         }
+
 
     }
 
@@ -228,6 +230,17 @@ public final class MovieAppDAO implements IMovieAppDAO {
         }
     }
 
+    public Movie getMovie(int id) throws SQLException {
+        PreparedStatement myStmt = null;
+        ResultSet rst = null;
+        myStmt = myConn.prepareStatement("SELECT a.ID, a.TITLE, a.DIRECTOR_ID, a.GENRE_ID, a.RELEASE_YEAR, b.RATING FROM MOVIES a " +
+                "INNER JOIN MOVIE_RATINGS b ON a.RATING_ID = b.ID WHERE a.ID LIKE ?");
+        myStmt.setInt(1, id);
+        rst = myStmt.executeQuery();
+        rst.next();
+        return new Movie(rst.getInt("ID"), rst.getString("TITLE"), rst.getInt("DIRECTOR_ID"), rst.getInt("GENRE_ID"), rst.getString("RELEASE_YEAR"), rst.getInt("RATING"));
+    }
+
     public void updateRating(int movieId, int rating) throws SQLException {
         PreparedStatement myStmt = null;
 
@@ -298,7 +311,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
 
         try {
 
-            prepState = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id " +
+            prepState = myConn.prepareStatement("SELECT a.id, a.title, b.first_name, b.last_name, c.name, a.release_year, a.rating_id, a.watched " +
                     "FROM MOVIES a " +
                     "INNER JOIN directors b ON a.director_id = b.id " +
                     "INNER JOIN genres c ON a.genre_id = c.id " +
@@ -349,7 +362,7 @@ public final class MovieAppDAO implements IMovieAppDAO {
         String last_name = myRs.getString("LAST_NAME");
         String genre = myRs.getString("NAME");
         String release_year = myRs.getString("RELEASE_YEAR");
-        int isWatched = myRs.getInt("WATCHED");
+        boolean isWatched = myRs.getBoolean("WATCHED");
 
         int ratingId = myRs.getInt("RATING_ID");
         Movie tempMovie;

@@ -11,10 +11,10 @@ public class Movie {
     private String releaseYear;
     private int rating;
     private int ratingId;
-    private int isWatched;
+    private boolean isWatched;
 
 
-    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int isWatched) {
+    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, boolean isWatched) {
         super();
         this.movieId = movieId;
         this.title = title;
@@ -25,7 +25,7 @@ public class Movie {
         this.rating = rating;
         this.isWatched = isWatched;
     }
-    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int ratingId, int isWatched) {
+    public Movie(int movieId, String title, String first_name, String last_name, String genre, String releaseYear, int rating, int ratingId, boolean isWatched) {
         super();
         this.movieId = movieId;
         this.title = title;
@@ -48,6 +48,16 @@ public class Movie {
         this.directorId = directorId;
         this.genreId = genreId;
         this.releaseYear = releaseYear;
+    }
+
+    public Movie(int movieId, String title, int directorId, int genreId, String releaseYear, int rating) {
+        super();
+        this.title = title;
+        this.directorId = directorId;
+        this.genreId = genreId;
+        this.releaseYear = releaseYear;
+        this.movieId = movieId;
+        this.rating = rating;
     }
 
     public int getMovieId() {
@@ -133,12 +143,12 @@ public class Movie {
                         movieId, title, directorId, genreId, releaseYear, rating, ratingId);
     }
 
-    public int getIsWatched() {
+    public boolean getIsWatched() {
         return isWatched;
     }
 
     public String getStatus() {
-        if (isWatched == 1) {
+        if (isWatched) {
             return "Watched";
         }
         else return "Unwatched";

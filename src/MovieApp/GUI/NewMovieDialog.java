@@ -1,6 +1,5 @@
 package MovieApp.GUI;
 
-import MovieApp.Model.Movie;
 import java.awt.*;
 
 import javax.swing.*;

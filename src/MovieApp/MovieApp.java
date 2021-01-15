@@ -1,5 +1,7 @@
 package MovieApp;
 
+import MovieApp.DAO.IMovieAppDAO;
+import MovieApp.DAO.MovieAppDAO;
 import MovieApp.GUI.MovieAppGUI;
 import MovieApp.Logic.IMovieManager;
 import MovieApp.Logic.MovieManager;
@@ -16,7 +18,8 @@ public class MovieApp {
      */
     public static void main(String[] args) {
                 try {
-                    movieManager = new MovieManager();
+                    IMovieAppDAO movieAppDAO = new MovieAppDAO();
+                    movieManager = new MovieManager(movieAppDAO);
                     frame = new MovieAppGUI(movieManager);
                     frame.setVisible(true);
                 } catch (Exception e) {

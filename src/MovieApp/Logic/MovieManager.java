@@ -1,6 +1,6 @@
 package MovieApp.Logic;
 
-import MovieApp.DAO.MovieAppDAO;
+import MovieApp.DAO.IMovieAppDAO;
 import MovieApp.Model.Movie;
 
 import java.sql.SQLException;
@@ -10,16 +10,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class MovieManager implements IMovieManager {
+    private IMovieAppDAO movieAppDAO;
 
-    private MovieAppDAO movieAppDAO;
-
-
-    public MovieManager() throws Exception {
-        try {
-            movieAppDAO = MovieAppDAO.getInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public MovieManager(IMovieAppDAO movieAppDAO) throws Exception {
+        this.movieAppDAO = movieAppDAO;
 
     }
 
@@ -46,14 +40,14 @@ public class MovieManager implements IMovieManager {
             return null;
     }
 
-    public String addToWatched(Movie movie, int rateConfirmed) throws SQLException {
+    public String addToWatched(Movie movie, boolean rateConfirmed) throws SQLException {
         String result = null;
-        if (movie.getIsWatched() == 1) {
+        if (movie.getIsWatched()) {
             result = "This movie is already watched";
         } else {
             movieAppDAO.addToWatched(movie.getMovieId());
             result = "Added to watched";
-            if (rateConfirmed != 0) {
+            if (!rateConfirmed) {
                 result += " and rated";
             }
         }
@@ -65,7 +59,7 @@ public class MovieManager implements IMovieManager {
         int id = movie.getMovieId();
         try {
             if (!movieAppDAO.checkWatchLater(id)) {
-                if (movie.getIsWatched() == 1) {
+                if (movie.getIsWatched()) {
                     result = "Movie is watched";
                 } else {
                     movieAppDAO.addToWatchLater(id);
@@ -107,6 +101,7 @@ public class MovieManager implements IMovieManager {
 
     @Override
     public String rateMovie(Movie movie, int rating) throws SQLException {
+
         int movieId = movie.getMovieId();
         if (movie.getRatingId() == 0 && rating != 0) {
             movie.setRating(rating);
@@ -121,13 +116,14 @@ public class MovieManager implements IMovieManager {
             return "Error while rating";
     }
 
+
     @Override
     public List<Movie> getWatched() {
         List<Movie> movies = getAllMovies();
         List<Movie> tempMovies = new ArrayList<>();
         if (movies != null) {
             for (Movie movie : movies) {
-                if (movie.getIsWatched() == 1) {
+                if (movie.getIsWatched()) {
                     tempMovies.add(movie);
                 }
             }
@@ -150,7 +146,7 @@ public class MovieManager implements IMovieManager {
     }
 
     public static String getStatus(Movie movie) {
-        if (movie.getIsWatched() == 1) {
+        if (movie.getIsWatched()) {
             if (movie.getRatingId() == 0)
                 return "Watched unrated";
             else

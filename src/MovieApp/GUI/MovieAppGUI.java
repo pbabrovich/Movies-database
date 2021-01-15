@@ -238,8 +238,7 @@ public class MovieAppGUI extends JFrame {
     }
 
     public void addToWatched() {
-        int rateConfirmed = 0;
-
+        boolean rateConfirmed = false;
         try {
 
             int row = table.getSelectedRow();
@@ -256,7 +255,7 @@ public class MovieAppGUI extends JFrame {
                 listAll();
                 return;
             }
-            rateConfirmed = 1;
+            rateConfirmed = true;
             rateMovie();
             movieManager.addToWatched(tempMovie, rateConfirmed);
             listAll();

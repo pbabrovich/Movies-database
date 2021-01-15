@@ -1,7 +1,5 @@
 package MovieApp.GUI;
 
-import MovieApp.DAO.MovieAppDAO;
-import MovieApp.Logic.MovieManager;
 import MovieApp.Model.Movie;
 import MovieApp.Model.Rating;
 
