@@ -38,5 +38,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="com.bluecatcode.mockito:mockito-1.10.19-extended:1.1.0" level="application" />
+    <orderEntry type="library" name="fitnesse-standalone" level="project" />
   </component>
 </module>

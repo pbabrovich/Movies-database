@@ -1,10 +1,9 @@
 package MovieApp.GUI;
 
 import MovieApp.Logic.IMovieManager;
-import MovieApp.Logic.MovieManager;
 import MovieApp.Model.Movie;
 import MovieApp.Model.MovieTableModel;
-import MovieApp.MovieApp;
+import MovieApp.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,10 +17,13 @@ public class MovieAppGUI extends JFrame {
     private final JTextField titleTextField;
     private final JTable table;
 
+    public MovieAppFacade movieAppFacade;
+
     IMovieManager movieManager;
 
     public MovieAppGUI(IMovieManager movieManager) {
         this.movieManager = movieManager;
+        movieAppFacade = new MovieAppFacade(this.movieManager);
         setTitle("Movie App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 450, 300);
@@ -159,7 +161,7 @@ public class MovieAppGUI extends JFrame {
 
             Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
 
-            movieManager.deleteMovie(tempMovie);
+            movieAppFacade.deleteMovie(tempMovie);
 
             listAll();
 
@@ -173,7 +175,7 @@ public class MovieAppGUI extends JFrame {
 
     public void listAll() {
         try {
-            List<Movie> list = movieManager.getAllMovies();
+            List<Movie> list = movieAppFacade.listAll();
             MovieTableModel tableModel = new MovieTableModel(list);
             table.setModel(tableModel);
         } catch (Exception e) {
@@ -184,7 +186,7 @@ public class MovieAppGUI extends JFrame {
     public void getWatched() {
         List<Movie> movies = null;
         try {
-            movies = movieManager.getWatched();
+            movies = movieAppFacade.getWatched();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -222,9 +224,9 @@ public class MovieAppGUI extends JFrame {
         MovieTableModel tableModel = null;
         try {
             String title = titleTextField.getText();
-            List<Movie> movies = movieManager.searchMovies(title);
+            List<Movie> movies = movieAppFacade.searchMovie(title);
             if (movies != null) {
-                tableModel = new MovieTableModel(movieManager.searchMovies(title));
+                tableModel = new MovieTableModel(movieAppFacade.searchMovie(title));
             }
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -251,13 +253,13 @@ public class MovieAppGUI extends JFrame {
             int callDialog = JOptionPane.showConfirmDialog(MovieAppGUI.this,
                     "Do you want to rate the movie?", "Rate movie", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (callDialog == JOptionPane.NO_OPTION) {
-                movieManager.addToWatched(tempMovie, rateConfirmed);
+                movieAppFacade.addToWatched(tempMovie, rateConfirmed);
                 listAll();
                 return;
             }
             rateConfirmed = true;
             rateMovie();
-            movieManager.addToWatched(tempMovie, rateConfirmed);
+            movieAppFacade.addToWatched(tempMovie, rateConfirmed);
             listAll();
         } catch (Exception exc) {
             JOptionPane.showMessageDialog(MovieAppGUI.this, "Error", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -265,8 +267,8 @@ public class MovieAppGUI extends JFrame {
     }
 
     public void summary() {
-        int averageRating = movieManager.getSummary().get("Average rating");
-        int moviesWatched = movieManager.getSummary().get("Watched movies");
+        int averageRating = movieAppFacade.summary().get("Average rating");
+        int moviesWatched = movieAppFacade.summary().get("Watched movies");
         JOptionPane.showMessageDialog(this, "Average rating : " + averageRating + "\n" +
                 "Watched movies : " + moviesWatched);
     }
@@ -278,13 +280,13 @@ public class MovieAppGUI extends JFrame {
             return;
         }
         Movie tempMovie = (Movie) table.getValueAt(row, MovieTableModel.OBJECT_COL);
-        String message = movieManager.addToWatchLater(tempMovie);
+        String message = movieAppFacade.addToWatchLater(tempMovie);
         JOptionPane.showMessageDialog(this, message);
     }
 
     public void showToWatchList() {
         try {
-            List<Movie> list = movieManager.getWatchLaterList();
+            List<Movie> list = movieAppFacade.getWatchLater();
             MovieTableModel tableModel = new MovieTableModel(list);
             table.setModel(tableModel);
         } catch (Exception e) {
